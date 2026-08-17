@@ -1,0 +1,3943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>EHS Bell Schedule</title>
+
+
+<!-- =========================================================
+     PWA
+     ========================================================= -->
+
+<link rel="manifest" href="./manifest.webmanifest">
+
+<meta name="theme-color" content="#d98c9c">
+<meta name="background-color" content="#fffaf8">
+
+<!-- iOS PWA support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EHS Bell Schedule">
+
+<link
+    rel="apple-touch-icon"
+    href="./icons/icon-192.png"
+>
+
+
+<style>
+
+/* =========================================================
+   EHS BELL SCHEDULE
+   ========================================================= */
+
+:root {
+    --bg: #fffaf8;
+    --surface: #ffffff;
+    --surface-2: #fff0f2;
+
+    --pink: #d98c9c;
+    --pink-dark: #a9586c;
+    --pink-light: #f4cbd3;
+
+    --blue: #9eb8c8;
+    --blue-dark: #587586;
+
+    --text: #3c3034;
+    --muted: #8d7e83;
+
+    --border: #ead8dc;
+
+    --done: #cfc8ca;
+
+    --shadow:
+        0 12px 35px rgba(103, 72, 80, 0.10);
+
+    --radius: 24px;
+}
+
+
+/* =========================
+   DARK MODE
+   ========================= */
+
+body.dark {
+    --bg: #18171b;
+    --surface: #242227;
+    --surface-2: #32282d;
+
+    --pink: #c98295;
+    --pink-dark: #e1a3b1;
+    --pink-light: #51343d;
+
+    --blue: #8ba8ba;
+    --blue-dark: #bdd1dc;
+
+    --text: #f4edf0;
+    --muted: #aaa0a5;
+
+    --border: #493d42;
+
+    --done: #514b4e;
+
+    --shadow:
+        0 12px 35px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================
+   GENERAL
+   ========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    min-height: 100vh;
+
+    background: var(--bg);
+    color: var(--text);
+
+    font-family:
+        "Trebuchet MS",
+        "Avenir Next",
+        "Segoe UI",
+        sans-serif;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease;
+}
+
+button {
+    font: inherit;
+}
+
+button:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+}
+
+
+/* =========================
+   APP HEADER
+   ========================= */
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    background: var(--bg);
+
+    padding:
+        max(18px, env(safe-area-inset-top))
+        max(18px, calc((100vw - 1050px) / 2))
+        18px
+        max(18px, calc((100vw - 1050px) / 2));
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.app-title {
+    font-size: 1.45rem;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+}
+
+.app-subtitle {
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-top: 2px;
+}
+
+.menu-button {
+    width: 50px;
+    height: 46px;
+
+    border: 0;
+    border-radius: 15px;
+
+    background: var(--surface);
+    box-shadow: var(--shadow);
+
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.menu-button span {
+    display: block;
+    width: 21px;
+    height: 2px;
+
+    background: var(--text);
+    border-radius: 5px;
+}
+
+
+/* =========================
+   ANNOUNCEMENT
+   ========================= */
+
+.announcement {
+    max-width: 1050px;
+    margin: 18px auto 0;
+    padding: 0 18px;
+}
+
+.announcement-inner {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    padding: 12px 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    overflow-x: auto;
+    white-space: nowrap;
+
+    box-shadow: var(--shadow);
+}
+
+.announcement-label {
+    color: var(--pink-dark);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.announcement-text {
+    font-size: 0.9rem;
+}
+
+
+/* =========================
+   PAGE
+   ========================= */
+
+.page {
+    max-width: 1050px;
+    margin: auto;
+
+    padding:
+        20px
+        18px
+        max(160px, calc(160px + env(safe-area-inset-bottom)));
+}
+
+.page.hidden {
+    display: none;
+}
+
+
+/* =========================
+   STATUS CARD
+   ========================= */
+
+.status-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 32px;
+
+    padding: 34px 24px 30px;
+
+    text-align: center;
+
+    box-shadow: var(--shadow);
+
+    margin-bottom: 26px;
+}
+
+.status-label {
+    font-size: 0.85rem;
+    font-weight: 900;
+
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+
+    color: var(--pink-dark);
+
+    margin-bottom: 8px;
+}
+
+.status-title {
+    font-size: clamp(2rem, 7vw, 4.5rem);
+    line-height: 0.95;
+
+    font-weight: 1000;
+
+    margin: 0;
+
+    letter-spacing: -0.04em;
+}
+
+.status-next {
+    margin-top: 13px;
+
+    color: var(--muted);
+
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.countdown {
+    margin: 22px 0 18px;
+
+    font-size: clamp(3.6rem, 13vw, 8.7rem);
+    line-height: 0.9;
+
+    font-weight: 1000;
+
+    letter-spacing: -0.07em;
+
+    color: var(--pink-dark);
+
+    font-variant-numeric: tabular-nums;
+}
+
+.countdown-caption {
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.class-details {
+    margin: 25px auto 0;
+
+    max-width: 650px;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+}
+
+.detail {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+
+    border-radius: 16px;
+
+    padding: 12px 8px;
+}
+
+.detail-label {
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.detail-value {
+    margin-top: 4px;
+
+    font-size: 0.9rem;
+    font-weight: 900;
+}
+
+.time-range {
+    margin-top: 16px;
+
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.duration-small {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+
+/* =========================
+   SECTION BANNER
+   ========================= */
+
+.section-banner {
+    background: var(--text);
+    color: var(--bg);
+
+    border-radius: 18px;
+
+    padding: 15px 19px;
+
+    margin: 28px 0 14px;
+
+    font-size: 0.82rem;
+    font-weight: 1000;
+
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+
+/* =========================
+   NEXT CLASS
+   ========================= */
+
+.next-class-card {
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    padding: 20px;
+
+    box-shadow: var(--shadow);
+}
+
+.next-class-name {
+    font-size: 1.6rem;
+    font-weight: 1000;
+}
+
+.next-class-info {
+    color: var(--muted);
+    margin-top: 7px;
+}
+
+
+/* =========================
+   DAILY SCHEDULE
+   ========================= */
+
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.schedule-item {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 92px 1fr auto;
+
+    align-items: center;
+    gap: 14px;
+
+    padding: 15px 17px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 19px;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.schedule-item.current {
+    background: var(--pink-light);
+
+    border-color: var(--pink);
+
+    transform: scale(1.012);
+}
+
+.schedule-item.done {
+    opacity: 0.43;
+}
+
+.schedule-item.done .schedule-name {
+    text-decoration: line-through;
+}
+
+.schedule-item.current::before {
+    content: "";
+
+    position: absolute;
+    left: -5px;
+
+    width: 4px;
+    height: 60%;
+
+    background: var(--pink-dark);
+
+    border-radius: 4px;
+}
+
+.schedule-time {
+    font-size: 0.76rem;
+    font-weight: 900;
+
+    color: var(--muted);
+}
+
+.schedule-name {
+    font-size: 1rem;
+    font-weight: 1000;
+}
+
+.schedule-meta {
+    color: var(--muted);
+    font-size: 0.73rem;
+
+    margin-top: 4px;
+}
+
+.schedule-duration {
+    font-size: 0.75rem;
+    color: var(--muted);
+
+    white-space: nowrap;
+}
+
+
+/* =========================
+   LUNCH PAGE
+   ========================= */
+
+.lunch-highlight {
+    background: var(--pink-light);
+
+    border: 1px solid var(--pink);
+
+    border-radius: 28px;
+
+    padding: 24px;
+
+    margin-bottom: 20px;
+
+    box-shadow: var(--shadow);
+}
+
+.lunch-highlight-label {
+    color: var(--pink-dark);
+
+    font-size: 0.72rem;
+    font-weight: 1000;
+
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.lunch-highlight-day {
+    font-size: 2rem;
+    font-weight: 1000;
+
+    margin-top: 4px;
+}
+
+.lunch-highlight-meal {
+    font-size: 1.2rem;
+    font-weight: 900;
+
+    margin-top: 14px;
+}
+
+.lunch-note {
+    margin-top: 12px;
+
+    font-size: 0.72rem;
+    color: var(--muted);
+}
+
+.lunch-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+
+    gap: 10px;
+}
+
+.lunch-day {
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 22px;
+
+    padding: 17px 13px;
+
+    min-height: 190px;
+}
+
+.lunch-day.today {
+    border: 2px solid var(--pink);
+    background: var(--surface-2);
+}
+
+.lunch-day-name {
+    font-size: 0.8rem;
+    font-weight: 1000;
+
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+
+    color: var(--muted);
+}
+
+.lunch-meal {
+    margin-top: 13px;
+
+    font-size: 0.92rem;
+    line-height: 1.35;
+
+    font-weight: 900;
+}
+
+
+/* =========================
+   SIDE MENU
+   ========================= */
+
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(20, 15, 18, 0.38);
+
+    z-index: 200;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.2s ease;
+}
+
+.menu-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+
+    width: min(390px, 92vw);
+    height: 100vh;
+
+    background: var(--bg);
+
+    z-index: 201;
+
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+
+    overflow-y: auto;
+
+    padding:
+        max(22px, env(safe-area-inset-top))
+        22px
+        22px;
+}
+
+.menu-overlay.open .side-menu {
+    transform: translateX(0);
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 24px;
+}
+
+.menu-header-title {
+    font-size: 1.4rem;
+    font-weight: 1000;
+}
+
+.close-menu {
+    width: 40px;
+    height: 40px;
+
+    border: 0;
+    border-radius: 13px;
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    cursor: pointer;
+
+    font-size: 1.3rem;
+}
+
+.menu-stripe {
+    width: 100%;
+
+    background: var(--text);
+    color: var(--bg);
+
+    border: 0;
+
+    border-radius: 15px;
+
+    padding: 16px;
+
+    margin-bottom: 9px;
+
+    text-align: left;
+
+    font-weight: 1000;
+
+    cursor: pointer;
+}
+
+.menu-stripe:hover {
+    opacity: 0.86;
+}
+
+.menu-section {
+    margin-top: 26px;
+}
+
+.menu-section-title {
+    font-size: 0.7rem;
+
+    color: var(--muted);
+
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+
+    font-weight: 1000;
+
+    margin-bottom: 9px;
+}
+
+.toggle-row {
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 17px;
+
+    padding: 13px 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggle-text strong {
+    display: block;
+    font-size: 0.9rem;
+}
+
+.toggle-text small {
+    color: var(--muted);
+}
+
+.switch {
+    position: relative;
+    width: 48px;
+    height: 27px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+
+    background: var(--border);
+
+    border-radius: 30px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 21px;
+    height: 21px;
+
+    left: 3px;
+    top: 3px;
+
+    background: var(--surface);
+
+    border-radius: 50%;
+
+    transition: 0.2s;
+}
+
+.switch input:checked + .slider {
+    background: var(--pink-dark);
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(21px);
+}
+
+
+/* =========================
+   MODAL
+   ========================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 300;
+
+    background: rgba(20, 15, 18, 0.52);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    width: min(580px, 100%);
+
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: var(--bg);
+
+    border: 1px solid var(--border);
+
+    border-radius: 28px;
+
+    padding: 24px;
+
+    box-shadow:
+        0 30px 90px rgba(0,0,0,0.25);
+}
+
+.modal-title {
+    font-size: 1.55rem;
+    font-weight: 1000;
+}
+
+.modal-subtitle {
+    color: var(--muted);
+    font-size: 0.85rem;
+
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.access-class-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 9px;
+}
+
+.access-class-button {
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 17px;
+
+    padding: 13px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    color: var(--text);
+}
+
+.access-class-button:hover {
+    background: var(--surface-2);
+    border-color: var(--pink);
+}
+
+.access-class-subject {
+    font-weight: 1000;
+    font-size: 0.9rem;
+}
+
+.access-class-teacher {
+    color: var(--muted);
+    font-size: 0.72rem;
+
+    margin-top: 4px;
+}
+
+.selected-access {
+    margin-top: 18px;
+
+    padding: 14px;
+
+    background: var(--surface-2);
+
+    border: 1px solid var(--border);
+
+    border-radius: 17px;
+}
+
+.selected-access strong {
+    color: var(--pink-dark);
+}
+
+.modal-close {
+    width: 100%;
+
+    border: 0;
+
+    background: var(--text);
+    color: var(--bg);
+
+    border-radius: 16px;
+
+    padding: 14px;
+
+    margin-top: 18px;
+
+    cursor: pointer;
+
+    font-weight: 1000;
+}
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 760px) {
+
+    .class-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lunch-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lunch-day {
+        min-height: auto;
+    }
+
+    .schedule-item {
+        grid-template-columns: 76px 1fr;
+    }
+
+    .schedule-duration {
+        display: none;
+    }
+
+    .access-class-list {
+        grid-template-columns: 1fr;
+    }
+
+    .status-card {
+        padding: 28px 17px;
+    }
+
+}
+
+@media (max-width: 430px) {
+
+    .app-title {
+        font-size: 1.15rem;
+    }
+
+    .countdown {
+        font-size: 3.55rem;
+    }
+
+    .status-title {
+        font-size: 2.55rem;
+    }
+
+    .schedule-item {
+        padding: 13px;
+        gap: 9px;
+    }
+
+    .schedule-time {
+        font-size: 0.68rem;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
+
+<header class="app-header">
+
+    <div>
+
+        <div class="app-title">
+            EHS Bell Schedule
+        </div>
+
+        <div
+            class="app-subtitle"
+            id="headerDate"
+        >
+            Loading...
+        </div>
+
+    </div>
+
+
+    <button
+        class="menu-button"
+        id="menuButton"
+        aria-label="Open menu"
+    >
+
+        <span></span>
+        <span></span>
+        <span></span>
+
+    </button>
+
+</header>
+
+
+<!-- =========================================================
+     ANNOUNCEMENTS
+     ========================================================= -->
+
+<div class="announcement">
+
+    <div class="announcement-inner">
+
+        <div class="announcement-label">
+            Announcements
+        </div>
+
+        <div
+            class="announcement-text"
+            id="announcementText"
+        >
+            Welcome to EHS.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     HOME / SCHEDULE PAGE
+     ========================================================= -->
+
+<main
+    id="schedulePage"
+    class="page"
+>
+
+    <section class="status-card">
+
+        <div
+            class="status-label"
+            id="statusLabel"
+        >
+            Loading
+        </div>
+
+        <h1
+            class="status-title"
+            id="statusTitle"
+        >
+            Loading
+        </h1>
+
+        <div
+            class="status-next"
+            id="statusNext"
+        >
+            Loading...
+        </div>
+
+        <div
+            class="countdown"
+            id="countdown"
+        >
+            00:00:00
+        </div>
+
+        <div
+            class="countdown-caption"
+            id="countdownCaption"
+        >
+            Calculating time...
+        </div>
+
+        <div
+            class="class-details"
+            id="classDetails"
+        >
+        </div>
+
+    </section>
+
+
+    <div class="section-banner">
+        Upcoming Class
+    </div>
+
+    <section class="next-class-card">
+
+        <div
+            class="next-class-name"
+            id="nextClassName"
+        >
+            —
+        </div>
+
+        <div
+            class="next-class-info"
+            id="nextClassInfo"
+        >
+            —
+        </div>
+
+    </section>
+
+
+    <div class="section-banner">
+        Today's Schedule
+    </div>
+
+    <section
+        id="scheduleList"
+        class="schedule-list"
+    >
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     LUNCH PAGE
+     ========================================================= -->
+
+<main
+    id="lunchPage"
+    class="page hidden"
+>
+
+    <div class="section-banner">
+        Lunch Menu
+    </div>
+
+    <section
+        id="todayLunch"
+        class="lunch-highlight"
+    >
+    </section>
+
+    <section
+        id="lunchGrid"
+        class="lunch-grid"
+    >
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     SIDE MENU
+     ========================================================= -->
+
+<div
+    id="menuOverlay"
+    class="menu-overlay"
+>
+
+    <aside class="side-menu">
+
+        <div class="menu-header">
+
+            <div class="menu-header-title">
+                Menu
+            </div>
+
+            <button
+                class="close-menu"
+                id="closeMenu"
+                aria-label="Close menu"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- PAGE NAVIGATION -->
+
+        <button
+            class="menu-stripe"
+            id="goSchedule"
+        >
+            Schedule
+        </button>
+
+        <button
+            class="menu-stripe"
+            id="goLunch"
+        >
+            Lunch Menu
+        </button>
+
+
+        <!-- ACCESS -->
+
+        <div class="menu-section">
+
+            <div class="menu-section-title">
+                Access
+            </div>
+
+            <button
+                class="menu-stripe"
+                id="accessButton"
+            >
+                Responsive Schedule: Access
+            </button>
+
+        </div>
+
+
+        <!-- SCHEDULE MODE -->
+
+        <div class="menu-section">
+
+            <div class="menu-section-title">
+                Schedule Mode
+            </div>
+
+            <div class="toggle-row">
+
+                <div class="toggle-text">
+
+                    <strong id="modeText">
+                        Normal Schedule
+                    </strong>
+
+                    <small>
+                        Automatically follows the day
+                    </small>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="minimumToggle"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- DARK MODE -->
+
+        <div class="menu-section">
+
+            <div class="menu-section-title">
+                Appearance
+            </div>
+
+            <div class="toggle-row">
+
+                <div class="toggle-text">
+
+                    <strong>
+                        Dark Mode
+                    </strong>
+
+                    <small>
+                        Dark dusty theme
+                    </small>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="darkToggle"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- TIME -->
+
+        <div class="menu-section">
+
+            <div class="menu-section-title">
+                Time
+            </div>
+
+            <div class="toggle-row">
+
+                <div class="toggle-text">
+
+                    <strong>
+                        School Timezone
+                    </strong>
+
+                    <small>
+                        America/Los_Angeles
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             INSTALL APP
+             ===================================================== -->
+
+        <div
+            class="menu-section"
+            id="installSection"
+            
+        >
+
+            <div class="menu-section-title">
+                App
+            </div>
+
+            <button
+                class="menu-stripe"
+                id="installButton"
+            >
+                Install EHS Schedule
+            </button>
+
+        </div>
+
+    </aside>
+
+</div>
+
+
+<!-- =========================================================
+     ACCESS MODAL
+     ========================================================= -->
+
+<div
+    id="accessModal"
+    class="modal-overlay"
+>
+
+    <div class="modal">
+
+        <div class="modal-title">
+            Responsive Schedule: Access
+        </div>
+
+        <div class="modal-subtitle">
+            Select the class you want for Wednesday or Thursday Access.
+        </div>
+
+        <div
+            id="accessClassList"
+            class="access-class-list"
+        >
+        </div>
+
+        <div
+            id="selectedAccess"
+            class="selected-access"
+        >
+            No Access override selected.
+        </div>
+
+        <button
+            class="modal-close"
+            id="closeAccessModal"
+        >
+            Done
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CONFIGURATION
+   ========================================================= */
+
+const SCHOOL_TIMEZONE =
+    "America/Los_Angeles";
+
+
+/* =========================================================
+   CLASS DATA
+   ========================================================= */
+
+const classes = {
+
+    1: {
+        subject: "Biology",
+        teacher: "Jimenez-Arroyo, Freddy",
+        room: "F-304"
+    },
+
+    2: {
+        subject: "Spanish 2",
+        teacher: "Rodriguez, Rosa",
+        room: "F-324"
+    },
+
+    3: {
+        subject: "English 1 Adv",
+        teacher: "Karantzalis, Athena E.",
+        room: "F-225"
+    },
+
+    4: {
+        subject: "Freshman P.E.",
+        teacher: "Mann, Michael",
+        room: "Gym"
+    },
+
+    5: {
+        subject: "Orch 3 - Honors Chamber",
+        teacher: "Tran, Jasper A.",
+        room: "C-105"
+    },
+
+    6: {
+        subject: "Adv. Algebra II",
+        teacher: "Snedden, Donald R.",
+        room: "F-337"
+    }
+
+};
+
+
+/* =========================================================
+   RESPONSIVE ACCESS OPTIONS
+   ========================================================= */
+
+const accessClasses = [
+
+    { teacher: "Willis, Jarrod Ryan", room: "G-338" },
+    { teacher: "Maxson, Patricia", room: "G-330" },
+    { teacher: "Lee, Thomas S.", room: "G-304" },
+    { teacher: "Tran, Jasper A.", room: "C-105" },
+    { teacher: "Mrs. Bogue", room: "G-143" },
+    { teacher: "Sherratt, Joy", room: "G-313" },
+    { teacher: "Pappalardo, Lindsay A.", room: "G-217" },
+    { teacher: "Heath, Jennifer", room: "G-312" },
+    { teacher: "Mehta, Purvi", room: "F-235" },
+    { teacher: "Udoutch, Bailey N.", room: "G-111" },
+    { teacher: "Douglass, Alisha D.", room: "C-115" },
+    { teacher: "Voeller, Kyle", room: "F-207" },
+    { teacher: "Johnston, Colleen", room: "G-227" },
+    { teacher: "Gordon Reska, Laura A.", room: "G-121" },
+    { teacher: "Turpel, Constance Chang", room: "F-215" },
+    { teacher: "Louris, Stephanie Koch", room: "F-335" },
+    { teacher: "Ramsay, Patricia Pamela", room: "F-115" },
+    { teacher: "Moon, Jisun", room: "F-228" },
+    { teacher: "Rodriguez, Gregory", room: "F-108" },
+    { teacher: "York, Sarah Katharine", room: "F-338" },
+    { teacher: "Wang, Michelle", room: "F-326" },
+    { teacher: "Lee, Rebecca J.", room: "G-216" },
+    { teacher: "Putman, Shayn", room: "G-209" },
+    { teacher: "Palanichamy, Subbulakshmi", room: "F-204" },
+    { teacher: "McLaughlin, Michael", room: "G-232" },
+    { teacher: "Deakin, Kjelene", room: "C-122" },
+    { teacher: "Subramonian, Geeta", room: "F-208" },
+    { teacher: "Courchaine, Clay", room: "C-110" },
+    { teacher: "Palma, Maria", room: "F-226" },
+    { teacher: "McLeod Santoyo, Marnie E.", room: "F-216" },
+    { teacher: "Karantzalis, Athena E.", room: "F-225" },
+    { teacher: "Rodriguez, Rosa", room: "F-324" },
+    { teacher: "Hermens, Katherine Marie", room: "G-328" },
+    { teacher: "Zlatkovic, Alexander", room: "G-334" },
+    { teacher: "Hulme, Jared", room: "G-223" },
+    { teacher: "Dunbar, Richard B.", room: "F-146" },
+    { teacher: "Shen, Ziwei", room: "F-307" },
+    { teacher: "Lee, Jung M.", room: "F-325" },
+    { teacher: "Roberts, Jaime L.", room: "G-214" },
+    { teacher: "Flores Ortega, Mayte", room: "F-214" },
+    { teacher: "Kanda, Andrea", room: "G-231" },
+    { teacher: "Soule, Koren", room: "F-233" },
+    { teacher: "Janisch, Matthew Glenn", room: "G-112" },
+    { teacher: "Josey, Jean", room: "E-202" },
+    { teacher: "Brumage, Eleana J.", room: "G-319" },
+    { teacher: "Silverberg-Lopez, Deborah Michele", room: "G-138" },
+    { teacher: "Lemmer, Jill", room: "G-318" },
+    { teacher: "Hernandez, Richard T.", room: "F-227" },
+    { teacher: "Imai, Carter Elaine", room: "G-141" }
+
+];
+
+
+/* =========================================================
+   BELL SCHEDULES
+   ========================================================= */
+
+const schedules = {
+
+    monday: [
+
+        { name: "HOMEROOM ACCESS", period: 0, start: "7:15", end: "8:20" },
+
+        { name: "Period 1", period: 1, start: "8:30", end: "9:20" },
+
+        { name: "Period 2", period: 2, start: "9:28", end: "10:18" },
+
+        { name: "Period 3", period: 3, start: "10:26", end: "11:16" },
+
+        { name: "Period 4", period: 4, start: "11:24", end: "12:14" },
+
+        {
+            name: "LUNCH",
+            type: "lunch",
+            start: "12:14",
+            end: "12:49"
+        },
+
+        {
+            name: "ACCESS PERIOD",
+            type: "access",
+            start: "12:57",
+            end: "13:29"
+        },
+
+        { name: "Period 5", period: 5, start: "13:37", end: "14:27" },
+
+        { name: "Period 6", period: 6, start: "14:35", end: "15:25" },
+
+        { name: "Period 7", period: 7, start: "15:33", end: "16:38" }
+
+    ],
+
+    tuesday: [
+
+        { name: "Period 0", period: 0, start: "7:15", end: "8:20" },
+
+        { name: "Period 1", period: 1, start: "8:30", end: "9:26" },
+
+        { name: "Period 2", period: 2, start: "9:34", end: "10:30" },
+
+        { name: "Period 3", period: 3, start: "10:38", end: "11:38" },
+
+        { name: "Period 4", period: 4, start: "11:46", end: "12:42" },
+
+        {
+            name: "LUNCH",
+            type: "lunch",
+            start: "12:42",
+            end: "13:17"
+        },
+
+        { name: "Period 5", period: 5, start: "13:25", end: "14:21" },
+
+        { name: "Period 6", period: 6, start: "14:29", end: "15:25" },
+
+        { name: "Period 7", period: 7, start: "15:33", end: "16:38" }
+
+    ],
+
+    wednesday: [
+
+        {
+            name: "Staff Collaboration",
+            type: "staff",
+            start: "8:00",
+            end: "8:55"
+        },
+
+        { name: "Period 1", period: 1, start: "9:00", end: "10:28" },
+
+        { name: "Period 3", period: 3, start: "10:36", end: "12:04" },
+
+        {
+            name: "LUNCH",
+            type: "lunch",
+            start: "12:04",
+            end: "12:39"
+        },
+
+        {
+            name: "ACCESS PERIOD",
+            type: "access",
+            start: "12:47",
+            end: "13:49"
+        },
+
+        { name: "Period 5", period: 5, start: "13:57", end: "15:25" }
+
+    ],
+
+    thursday: [
+
+        { name: "Period 0", period: 0, start: "7:15", end: "8:20" },
+
+        { name: "Period 2", period: 2, start: "8:30", end: "9:58" },
+
+        { name: "Period 4", period: 4, start: "10:06", end: "11:34" },
+
+        {
+            name: "LUNCH",
+            type: "lunch",
+            start: "11:34",
+            end: "12:09"
+        },
+
+        {
+            name: "ACCESS PERIOD",
+            type: "access",
+            start: "12:17",
+            end: "13:09"
+        },
+
+        { name: "Period 6", period: 6, start: "13:17", end: "14:45" },
+
+        { name: "Period 7", period: 7, start: "14:53", end: "15:58" }
+
+    ],
+
+    friday: [
+
+        { name: "Period 0", period: 0, start: "7:15", end: "8:20" },
+
+        { name: "Period 1", period: 1, start: "8:30", end: "9:26" },
+
+        { name: "Period 2", period: 2, start: "9:34", end: "10:30" },
+
+        { name: "Period 3", period: 3, start: "10:38", end: "11:38" },
+
+        { name: "Period 4", period: 4, start: "11:46", end: "12:42" },
+
+        {
+            name: "LUNCH",
+            type: "lunch",
+            start: "12:42",
+            end: "13:17"
+        },
+
+        { name: "Period 5", period: 5, start: "13:25", end: "14:21" },
+
+        { name: "Period 6", period: 6, start: "14:29", end: "15:25" },
+
+        { name: "Period 7", period: 7, start: "15:33", end: "16:38" }
+
+    ]
+
+};
+
+
+/* =========================================================
+   MINIMUM DAY
+   ========================================================= */
+
+const minimumSchedule = [
+
+    { name: "Period 0", period: 0, start: "7:15", end: "8:20" },
+
+    { name: "Period 1", period: 1, start: "8:30", end: "9:00" },
+
+    { name: "Period 2", period: 2, start: "9:07", end: "9:37" },
+
+    { name: "Period 3", period: 3, start: "9:44", end: "10:14" },
+
+    { name: "Period 4", period: 4, start: "10:21", end: "10:51" },
+
+    {
+        name: "BRUNCH",
+        type: "lunch",
+        start: "10:51",
+        end: "11:06"
+    },
+
+    { name: "Period 5", period: 5, start: "11:13", end: "11:43" },
+
+    { name: "Period 6", period: 6, start: "11:50", end: "12:20" },
+
+    { name: "Period 7", period: 7, start: "12:27", end: "12:57" }
+
+];
+
+
+/* =========================================================
+   SCHOOL CALENDAR
+   ========================================================= */
+
+const noSchoolDates = [
+
+    "2026-09-07",
+
+    "2026-10-15",
+    "2026-10-16",
+
+    "2026-11-11",
+
+    "2026-11-23",
+    "2026-11-24",
+    "2026-11-25",
+    "2026-11-26",
+    "2026-11-27",
+
+    "2026-12-21",
+    "2026-12-22",
+    "2026-12-23",
+    "2026-12-24",
+    "2026-12-25",
+    "2026-12-28",
+    "2026-12-29",
+    "2026-12-30",
+    "2026-12-31",
+
+    "2027-01-01",
+    "2027-01-04",
+
+    "2027-01-18",
+
+    "2027-02-15",
+
+    "2027-03-12",
+
+    "2027-04-05",
+    "2027-04-06",
+    "2027-04-07",
+    "2027-04-08",
+    "2027-04-09"
+
+];
+
+
+const minimumDays = [
+    "2027-04-02"
+];
+
+
+const announcements = {
+
+    "2026-10-09":
+        "End of First Quarter",
+
+    "2026-12-18":
+        "End of First Semester",
+
+    "2027-03-11":
+        "End of Third Quarter",
+
+    "2027-04-02":
+        "Minimum Day",
+
+    "2027-05-27":
+        "Last Day of School and Semester Ends"
+
+};
+
+
+/* =========================================================
+   LUNCH DATA
+   ========================================================= */
+
+const lunchMenu = {
+
+    monday: {
+        meal:
+            "Chef's Choice Pizza or Cheese Pizza",
+        note:
+            "Vegetarian option available."
+    },
+
+    tuesday: {
+        meal:
+            "BBQ Brisket Sandwich with Potatoes Wedges or Pesto Pasta Salad",
+        note:
+            "Vegetarian option available."
+    },
+
+    wednesday: {
+        meal:
+            "Korean BBQ Chicken Meatball Pasta or Cheesy Garlic Edamame Noodle",
+        note:
+            "Vegetarian option available."
+    },
+
+    thursday: {
+        meal:
+            "Buffalo Chicken Mac & Cheese with Cornbread or Mac & Cheese with Cornbread",
+        note:
+            "Vegetarian option available."
+    },
+
+    friday: {
+        meal:
+            "General Tso's Chicken Rice Bowl or Butter Paneer with Basmati Rice and Naan Bread",
+        note:
+            "Vegetarian option available."
+    }
+
+};
+
+
+/* =========================================================
+   ACCESS OPTIONS
+   ========================================================= */
+
+const accessOptions = [
+
+    { teacher: "Bacher, Samantha", room: "Stadium" },
+    { teacher: "Brumage, Eleana J.", room: "G-319" },
+    { teacher: "Chen, Xiaoyun", room: "F-316" },
+    { teacher: "Courchaine, Clay", room: "C-110" },
+    { teacher: "Deakin, Kjelene", room: "C-122" },
+    { teacher: "Douglass, Alisha D.", room: "C-115" },
+    { teacher: "Flores Ortega, Mayte", room: "F-214" },
+    { teacher: "Gordon Reska, Laura A.", room: "Gym" },
+    { teacher: "Heath, Jennifer", room: "G-312" },
+    { teacher: "Hermens, Katherine Marie", room: "G-328" },
+    { teacher: "Hernandez, Richard T.", room: "F-227" },
+    { teacher: "Janisch, Matthew Glenn", room: "G-112" },
+    { teacher: "Johnston, Colleen", room: "G-227" },
+    { teacher: "Josey, Jean", room: "E-202" },
+    { teacher: "Kanda, Andrea", room: "G-231" },
+    { teacher: "Karantzalis, Athena E.", room: "F-225" },
+    { teacher: "Lee, Jung M.", room: "F-325" },
+    { teacher: "Lee, Rebecca J.", room: "G-216" },
+    { teacher: "Lee, Thomas S.", room: "G-304" },
+    { teacher: "Lemmer, Jill", room: "G-318" },
+    { teacher: "Louris, Stephanie Koch", room: "F-335" },
+    { teacher: "Maxson, Patricia", room: "G-330" },
+    { teacher: "McLeod Santoyo, Marnie E.", room: "F-216" },
+    { teacher: "McLaughlin, Michael", room: "G-232" },
+    { teacher: "Mehta, Purvi", room: "F-235" },
+    { teacher: "Meehan, Nicole E.", room: "G-142" },
+    { teacher: "Moon, Jisun", room: "F-228" },
+    { teacher: "Nandakishore, Pallavi", room: "Stadium" },
+    { teacher: "Palma, Maria", room: "F-226" },
+    { teacher: "Palanichamy, Subbulakshmi", room: "F-204" },
+    { teacher: "Putman, Shayn", room: "G-209" },
+    { teacher: "Ramsay, Patricia Pamela", room: "F-115" },
+    { teacher: "Roberts, Jaime L.", room: "G-214" },
+    { teacher: "Rodriguez, Gregory", room: "F-108" },
+    { teacher: "Rodriguez, Rosa", room: "F-324" },
+    { teacher: "Shen, Ziwei", room: "F-307" },
+    { teacher: "Sherratt, Joy", room: "G-313" },
+    { teacher: "Silverberg-Lopez, Deborah Michele", room: "G-138" },
+    { teacher: "Soule, Koren", room: "F-233" },
+    { teacher: "Srour, Razan V.", room: "G-335" },
+    { teacher: "Subramonian, Geeta", room: "F-208" },
+    { teacher: "Tran, Jasper A.", room: "C-105" },
+    { teacher: "Turpel, Constance Chang", room: "F-215" },
+    { teacher: "Voeller, Kyle", room: "F-207" },
+    { teacher: "Vuong, Neilson", room: "G-225" },
+    { teacher: "Wang, Michelle", room: "F-326" },
+    { teacher: "Willis, Jarrod Ryan", room: "G-338" },
+    { teacher: "York, Sarah Katharine", room: "F-338" },
+    { teacher: "Zlatkovic, Alexander", room: "G-334" }
+
+];
+
+
+let accessOverrides = {
+    wednesday: null,
+    thursday: null
+};
+
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const countdownEl =
+    document.getElementById("countdown");
+
+const countdownCaptionEl =
+    document.getElementById("countdownCaption");
+
+const statusLabelEl =
+    document.getElementById("statusLabel");
+
+const statusTitleEl =
+    document.getElementById("statusTitle");
+
+const statusNextEl =
+    document.getElementById("statusNext");
+
+const classDetailsEl =
+    document.getElementById("classDetails");
+
+const nextClassNameEl =
+    document.getElementById("nextClassName");
+
+const nextClassInfoEl =
+    document.getElementById("nextClassInfo");
+
+const scheduleListEl =
+    document.getElementById("scheduleList");
+
+const headerDateEl =
+    document.getElementById("headerDate");
+
+const announcementTextEl =
+    document.getElementById("announcementText");
+
+const modeTextEl =
+    document.getElementById("modeText");
+
+const minimumToggle =
+    document.getElementById("minimumToggle");
+
+const darkToggle =
+    document.getElementById("darkToggle");
+
+const menuOverlay =
+    document.getElementById("menuOverlay");
+
+const accessModal =
+    document.getElementById("accessModal");
+
+const accessClassList =
+    document.getElementById("accessClassList");
+
+const selectedAccessEl =
+    document.getElementById("selectedAccess");
+
+
+/* =========================================================
+   PWA INSTALL STATE
+   ========================================================= */
+
+let deferredInstallPrompt = null;
+
+const installSection =
+    document.getElementById("installSection");
+
+const installButton =
+    document.getElementById("installButton");
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let manualMinimumMode = false;
+
+
+/* =========================================================
+   TIME HELPERS
+   ========================================================= */
+
+function pad(number) {
+
+    return String(number).padStart(2, "0");
+
+}
+
+
+function now() {
+
+    return new Date();
+
+}
+
+
+function getDateKey(date = now()) {
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        pad(date.getMonth() + 1);
+
+    const day =
+        pad(date.getDate());
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+function getDayName(date = now()) {
+
+    const days = [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday"
+    ];
+
+    return days[date.getDay()];
+
+}
+
+
+function parseTime(
+    timeString,
+    date = now()
+) {
+
+    const [hours, minutes] =
+        timeString
+            .split(":")
+            .map(Number);
+
+    const result =
+        new Date(date);
+
+    result.setHours(
+        hours,
+        minutes,
+        0,
+        0
+    );
+
+    return result;
+
+}
+
+
+function formatTime(date) {
+
+    return date.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+    });
+
+}
+
+
+function formatDate(date) {
+
+    return date.toLocaleDateString([], {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+    });
+
+}
+
+
+function formatDuration(milliseconds) {
+
+    let totalSeconds =
+        Math.max(
+            0,
+            Math.floor(milliseconds / 1000)
+        );
+
+    const hours =
+        Math.floor(
+            totalSeconds / 3600
+        );
+
+    totalSeconds %= 3600;
+
+    const minutes =
+        Math.floor(
+            totalSeconds / 60
+        );
+
+    const seconds =
+        totalSeconds % 60;
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+}
+
+
+/* =========================================================
+   SCHOOL DAY LOGIC
+   ========================================================= */
+
+function isNoSchool(date = now()) {
+
+    return noSchoolDates.includes(
+        getDateKey(date)
+    );
+
+}
+
+
+function isMinimumDay(date = now()) {
+
+    return minimumDays.includes(
+        getDateKey(date)
+    );
+
+}
+
+
+function isBeforeFirstDay(date = now()) {
+
+    const firstDay =
+        new Date("2026-08-11T00:00:00");
+
+    return date < firstDay;
+
+}
+
+
+function isAfterLastDay(date = now()) {
+
+    const lastDay =
+        new Date("2027-05-27T23:59:59");
+
+    return date > lastDay;
+
+}
+
+
+function getScheduleForDate(
+    date = now()
+) {
+
+    if (manualMinimumMode) {
+
+        return minimumSchedule;
+
+    }
+
+    if (isMinimumDay(date)) {
+
+        return minimumSchedule;
+
+    }
+
+    const day =
+        getDayName(date);
+
+    return schedules[day] || null;
+
+}
+
+
+/* =========================================================
+   CLASS LOOKUP
+   ========================================================= */
+
+/*
+   Period 0 intentionally does NOT map
+   to Biology. Only periods 1–6 use
+   the normal class data.
+*/
+
+function getClassForPeriod(period) {
+
+    return classes[period] || null;
+
+}
+
+
+/* =========================================================
+   ACCESS
+   ========================================================= */
+
+function getAccessInfo(dayName) {
+
+    const override =
+        accessOverrides[dayName];
+
+    if (!override) {
+
+        return {
+            teacher: "Select an Access class",
+            room: "Access"
+        };
+
+    }
+
+    return override;
+
+}
+
+
+/* =========================================================
+   CREATE DISPLAY ENTRY
+   ========================================================= */
+
+function makeEntry(item, date) {
+
+    const start =
+        parseTime(
+            item.start,
+            date
+        );
+
+    const end =
+        parseTime(
+            item.end,
+            date
+        );
+
+    let displayName =
+        item.name;
+
+    let teacher = "";
+    let room = "";
+
+
+    if (item.period !== undefined) {
+
+        const classInfo =
+            getClassForPeriod(
+                item.period
+            );
+
+        if (classInfo) {
+
+            displayName =
+                classInfo.subject;
+
+            teacher =
+                classInfo.teacher;
+
+            room =
+                classInfo.room;
+
+        }
+
+    }
+
+
+    if (item.type === "access") {
+
+        const day =
+            getDayName(date);
+
+        const accessInfo =
+            getAccessInfo(day);
+
+        displayName =
+            "Responsive Access";
+
+        teacher =
+            accessInfo.teacher;
+
+        room =
+            accessInfo.room;
+
+    }
+
+
+    return {
+
+        ...item,
+
+        startDate: start,
+        endDate: end,
+
+        displayName,
+        teacher,
+        room
+
+    };
+
+}
+
+
+/* =========================================================
+   GET ENTRIES
+   ========================================================= */
+
+function getEntries(date = now()) {
+
+    const schedule =
+        getScheduleForDate(date);
+
+    if (!schedule) {
+
+        return [];
+
+    }
+
+    return schedule.map(
+        item => makeEntry(item, date)
+    );
+
+}
+
+
+/* =========================================================
+   DAY STATE
+   ========================================================= */
+
+function getDayState(date = now()) {
+
+    const entries =
+        getEntries(date);
+
+    if (!entries.length) {
+
+        return {
+            status: "no-school",
+            current: null,
+            next: null,
+            entries
+        };
+
+    }
+
+
+    const current =
+        entries.find(entry => {
+
+            return (
+                date >= entry.startDate &&
+                date < entry.endDate
+            );
+
+        });
+
+
+    const next =
+        entries.find(entry => {
+
+            return date < entry.startDate;
+
+        });
+
+
+    if (!current && next) {
+
+        return {
+            status: "passing",
+            current: null,
+            next,
+            entries
+        };
+
+    }
+
+
+    if (!current && !next) {
+
+        return {
+            status: "school-over",
+            current: null,
+            next: null,
+            entries
+        };
+
+    }
+
+
+    return {
+
+        status: "class",
+
+        current,
+
+        next:
+            entries[
+                entries.indexOf(current) + 1
+            ] || null,
+
+        entries
+
+    };
+
+}
+
+
+/* =========================================================
+   NEXT SCHOOL DAY
+   ========================================================= */
+
+function getNextSchoolDay() {
+
+    const candidate =
+        new Date(now());
+
+    candidate.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    for (
+        let i = 0;
+        i < 370;
+        i++
+    ) {
+
+        if (i > 0) {
+
+            candidate.setDate(
+                candidate.getDate() + 1
+            );
+
+        }
+
+
+        const day =
+            getDayName(candidate);
+
+        const weekday =
+            day !== "saturday" &&
+            day !== "sunday";
+
+
+        if (
+            weekday &&
+            !isNoSchool(candidate) &&
+            !isBeforeFirstDay(candidate) &&
+            !isAfterLastDay(candidate)
+        ) {
+
+            const schedule =
+                getScheduleForDate(candidate);
+
+            if (schedule) {
+
+                return candidate;
+
+            }
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+function getNextSchoolStart() {
+
+    const date =
+        getNextSchoolDay();
+
+    if (!date) {
+
+        return null;
+
+    }
+
+    const schedule =
+        getScheduleForDate(date);
+
+    if (
+        !schedule ||
+        !schedule.length
+    ) {
+
+        return null;
+
+    }
+
+    return parseTime(
+        schedule[0].start,
+        date
+    );
+
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function renderStatus() {
+
+    const currentTime =
+        now();
+
+    const state =
+        getDayState(currentTime);
+
+
+    if (isBeforeFirstDay(currentTime)) {
+
+        renderBeforeSchool();
+
+        return;
+
+    }
+
+
+    if (isAfterLastDay(currentTime)) {
+
+        renderAfterSchool();
+
+        return;
+
+    }
+
+
+    if (state.status === "no-school") {
+
+        renderNoSchool();
+
+        return;
+
+    }
+
+
+    if (state.status === "class") {
+
+        renderClassState(
+            state.current,
+            state.next,
+            currentTime
+        );
+
+        return;
+
+    }
+
+
+    if (state.status === "passing") {
+
+        renderPassingState(
+            state.next,
+            currentTime
+        );
+
+        return;
+
+    }
+
+
+    renderSchoolOver();
+
+}
+
+
+/* =========================================================
+   CLASS STATE
+   ========================================================= */
+
+function renderClassState(
+    current,
+    next,
+    currentTime
+) {
+
+    statusLabelEl.textContent =
+        "Currently in";
+
+    statusTitleEl.textContent =
+        current.displayName;
+
+    statusNextEl.textContent =
+        next
+            ? `NEXT CLASS: ${next.displayName}`
+            : "THIS IS THE LAST CLASS OF THE DAY";
+
+
+    const remaining =
+        current.endDate -
+        currentTime;
+
+    countdownEl.textContent =
+        formatDuration(remaining);
+
+    countdownCaptionEl.textContent =
+        "TIME LEFT IN CLASS";
+
+
+    const duration =
+        current.endDate -
+        current.startDate;
+
+
+    classDetailsEl.innerHTML = `
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Period
+            </div>
+
+            <div class="detail-value">
+                ${current.name}
+            </div>
+
+        </div>
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Teacher
+            </div>
+
+            <div class="detail-value">
+                ${current.teacher || "—"}
+            </div>
+
+        </div>
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Room
+            </div>
+
+            <div class="detail-value">
+                ${current.room || "—"}
+            </div>
+
+        </div>
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Length
+            </div>
+
+            <div class="detail-value">
+                ${Math.round(
+                    duration / 60000
+                )} min
+            </div>
+
+        </div>
+
+    `;
+
+
+    renderTimeRange(
+        current,
+        duration
+    );
+
+    renderNextClass(next);
+
+}
+
+
+/* =========================================================
+   PASSING STATE
+   ========================================================= */
+
+function renderPassingState(
+    next,
+    currentTime
+) {
+
+    statusLabelEl.textContent =
+        "Passing Period";
+
+    statusTitleEl.textContent =
+        "NEXT CLASS";
+
+    statusNextEl.textContent =
+        next
+            ? next.displayName
+            : "—";
+
+
+    const remaining =
+        next.startDate -
+        currentTime;
+
+    countdownEl.textContent =
+        formatDuration(remaining);
+
+    countdownCaptionEl.textContent =
+        "TIME UNTIL CLASS STARTS";
+
+
+    classDetailsEl.innerHTML = `
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Starts
+            </div>
+
+            <div class="detail-value">
+                ${formatTime(next.startDate)}
+            </div>
+
+        </div>
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Teacher
+            </div>
+
+            <div class="detail-value">
+                ${next.teacher || "—"}
+            </div>
+
+        </div>
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Room
+            </div>
+
+            <div class="detail-value">
+                ${next.room || "—"}
+            </div>
+
+        </div>
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                Period
+            </div>
+
+            <div class="detail-value">
+                ${next.name}
+            </div>
+
+        </div>
+
+    `;
+
+
+    renderNextClass(next);
+
+}
+
+
+/* =========================================================
+   TIME RANGE
+   ========================================================= */
+
+function renderTimeRange(
+    entry,
+    duration
+) {
+
+    let existing =
+        document.getElementById(
+            "timeRangeDisplay"
+        );
+
+
+    if (!existing) {
+
+        existing =
+            document.createElement(
+                "div"
+            );
+
+        existing.id =
+            "timeRangeDisplay";
+
+        existing.className =
+            "time-range";
+
+
+        classDetailsEl.parentNode.insertBefore(
+            existing,
+            classDetailsEl.nextSibling
+        );
+
+    }
+
+
+    existing.innerHTML = `
+
+        ${formatTime(entry.startDate)}
+        – ${formatTime(entry.endDate)}
+
+        <span class="duration-small">
+            / ${Math.round(
+                duration / 60000
+            )} min
+        </span>
+
+    `;
+
+}
+
+
+/* =========================================================
+   NEXT CLASS
+   ========================================================= */
+
+function renderNextClass(next) {
+
+    if (!next) {
+
+        nextClassNameEl.textContent =
+            "No more classes today";
+
+        nextClassInfoEl.textContent =
+            "School day is finished.";
+
+        return;
+
+    }
+
+
+    nextClassNameEl.textContent =
+        next.displayName;
+
+    nextClassInfoEl.textContent =
+        `${formatTime(next.startDate)} – ${formatTime(next.endDate)} · ${next.teacher || "Access"}`;
+
+}
+
+
+/* =========================================================
+   SCHOOL OVER
+   ========================================================= */
+
+function renderSchoolOver() {
+
+    statusLabelEl.textContent =
+        "School Day Over";
+
+    statusTitleEl.textContent =
+        "SEE YOU TOMORROW";
+
+    statusNextEl.textContent =
+        "Next school day starts at 7:15 AM";
+
+
+    const nextStart =
+        getNextSchoolStart();
+
+
+    if (nextStart) {
+
+        countdownEl.textContent =
+            formatDuration(
+                nextStart - now()
+            );
+
+        countdownCaptionEl.textContent =
+            "UNTIL THE NEXT SCHOOL DAY";
+
+    }
+
+
+    classDetailsEl.innerHTML = "";
+
+    renderNextSchoolDay();
+
+}
+
+
+/* =========================================================
+   NO SCHOOL
+   ========================================================= */
+
+function renderNoSchool() {
+
+    statusLabelEl.textContent =
+        "No School";
+
+    statusTitleEl.textContent =
+        "NO SCHOOL TODAY";
+
+    statusNextEl.textContent =
+        "Next school day:";
+
+
+    const nextStart =
+        getNextSchoolStart();
+
+
+    if (nextStart) {
+
+        countdownEl.textContent =
+            formatDuration(
+                nextStart - now()
+            );
+
+        countdownCaptionEl.textContent =
+            "UNTIL THE NEXT SCHOOL DAY";
+
+    }
+
+
+    classDetailsEl.innerHTML = "";
+
+    renderNextSchoolDay();
+
+}
+
+
+/* =========================================================
+   BEFORE SCHOOL
+   ========================================================= */
+
+function renderBeforeSchool() {
+
+    statusLabelEl.textContent =
+        "School Starts Soon";
+
+    statusTitleEl.textContent =
+        "FIRST DAY";
+
+    statusNextEl.textContent =
+        "Tuesday, August 11";
+
+
+    const firstDay =
+        new Date(
+            "2026-08-11T07:15:00"
+        );
+
+
+    countdownEl.textContent =
+        formatDuration(
+            firstDay - now()
+        );
+
+    countdownCaptionEl.textContent =
+        "UNTIL SCHOOL STARTS";
+
+
+    classDetailsEl.innerHTML = "";
+
+}
+
+
+/* =========================================================
+   AFTER SCHOOL YEAR
+   ========================================================= */
+
+function renderAfterSchool() {
+
+    statusLabelEl.textContent =
+        "School Year Complete";
+
+    statusTitleEl.textContent =
+        "SUMMER";
+
+    statusNextEl.textContent =
+        "The 2026–27 school year is over.";
+
+    countdownEl.textContent =
+        "00:00:00";
+
+    countdownCaptionEl.textContent =
+        "SCHOOL YEAR COMPLETE";
+
+    classDetailsEl.innerHTML = "";
+
+}
+
+
+/* =========================================================
+   NEXT SCHOOL DAY CARD
+   ========================================================= */
+
+function renderNextSchoolDay() {
+
+    const nextDate =
+        getNextSchoolDay();
+
+
+    if (!nextDate) {
+
+        nextClassNameEl.textContent =
+            "No upcoming school day";
+
+        nextClassInfoEl.textContent =
+            "";
+
+        return;
+
+    }
+
+
+    nextClassNameEl.textContent =
+        formatDate(nextDate);
+
+    nextClassInfoEl.textContent =
+        "First scheduled block begins at 7:15 AM.";
+
+}
+
+
+/* =========================================================
+   SCHEDULE LIST
+   ========================================================= */
+
+function renderScheduleList() {
+
+    const date =
+        now();
+
+    const entries =
+        getEntries(date);
+
+    scheduleListEl.innerHTML = "";
+
+
+    if (!entries.length) {
+
+        scheduleListEl.innerHTML = `
+
+            <div class="next-class-card">
+
+                <div class="next-class-name">
+                    No School
+                </div>
+
+                <div class="next-class-info">
+                    There is no bell schedule today.
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const state =
+        getDayState(date);
+
+
+    entries.forEach(entry => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "schedule-item";
+
+
+        const isCurrent =
+            state.current === entry;
+
+        const isDone =
+            date >= entry.endDate;
+
+
+        if (isCurrent) {
+
+            item.classList.add(
+                "current"
+            );
+
+        }
+
+
+        if (isDone) {
+
+            item.classList.add(
+                "done"
+            );
+
+        }
+
+
+        const time =
+            `${formatTime(entry.startDate)} – ${formatTime(entry.endDate)}`;
+
+
+        let meta = "";
+
+
+        if (entry.teacher) {
+
+            meta =
+                `${entry.teacher} · ${entry.room}`;
+
+        }
+
+
+        item.innerHTML = `
+
+            <div class="schedule-time">
+                ${time}
+            </div>
+
+            <div>
+
+                <div class="schedule-name">
+                    ${entry.displayName}
+                </div>
+
+                <div class="schedule-meta">
+                    ${meta}
+                </div>
+
+            </div>
+
+            <div class="schedule-duration">
+
+                ${Math.round(
+                    (entry.endDate - entry.startDate)
+                    / 60000
+                )} min
+
+            </div>
+
+        `;
+
+
+        scheduleListEl.appendChild(
+            item
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   LUNCH PAGE
+   ========================================================= */
+
+function renderLunchPage() {
+
+    const today =
+        getDayName();
+
+    const todayData =
+        lunchMenu[today];
+
+
+    if (todayData) {
+
+        todayLunch.innerHTML = `
+
+            <div class="lunch-highlight-label">
+                Today's Lunch
+            </div>
+
+            <div class="lunch-highlight-day">
+                ${today.toUpperCase()}
+            </div>
+
+            <div class="lunch-highlight-meal">
+                ${todayData.meal}
+            </div>
+
+            <div class="lunch-note">
+                ${todayData.note}
+            </div>
+
+        `;
+
+    } else {
+
+        todayLunch.innerHTML = `
+
+            <div class="lunch-highlight-label">
+                Today's Lunch
+            </div>
+
+            <div class="lunch-highlight-day">
+                ${today.toUpperCase()}
+            </div>
+
+            <div class="lunch-highlight-meal">
+                No menu entered for today.
+            </div>
+
+        `;
+
+    }
+
+
+    lunchGrid.innerHTML = "";
+
+
+    const days = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday"
+    ];
+
+
+    days.forEach(day => {
+
+        const data =
+            lunchMenu[day];
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "lunch-day";
+
+
+        if (day === today) {
+
+            card.classList.add(
+                "today"
+            );
+
+        }
+
+
+        card.innerHTML = `
+
+            <div class="lunch-day-name">
+                ${day}
+            </div>
+
+            <div class="lunch-meal">
+
+                ${
+                    data
+                        ? data.meal
+                        : "No menu entered."
+                }
+
+            </div>
+
+            ${
+                data
+                    ? `
+                        <div class="lunch-note">
+                            ${data.note}
+                        </div>
+                    `
+                    : ""
+            }
+
+        `;
+
+
+        lunchGrid.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENT
+   ========================================================= */
+
+function renderAnnouncement() {
+
+    const key =
+        getDateKey();
+
+    const announcement =
+        announcements[key];
+
+
+    if (announcement) {
+
+        announcementTextEl.textContent =
+            announcement;
+
+        return;
+
+    }
+
+
+    if (isMinimumDay()) {
+
+        announcementTextEl.textContent =
+            "Minimum Day";
+
+        return;
+
+    }
+
+
+    if (isNoSchool()) {
+
+        announcementTextEl.textContent =
+            "No School Today";
+
+        return;
+
+    }
+
+
+    announcementTextEl.textContent =
+        "No special announcements for today.";
+
+}
+
+
+/* =========================================================
+   HEADER DATE
+   ========================================================= */
+
+function renderHeaderDate() {
+
+    headerDateEl.textContent =
+        formatDate(now());
+
+}
+
+
+/* =========================================================
+   ACCESS MODAL
+   ========================================================= */
+
+function renderAccessClasses() {
+
+    accessClassList.innerHTML = "";
+
+
+    accessOptions.forEach(accessInfo => {
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "access-class-button";
+
+
+        button.innerHTML = `
+
+            <div class="access-class-subject">
+                ${accessInfo.teacher}
+            </div>
+
+            <div class="access-class-teacher">
+                Room ${accessInfo.room}
+            </div>
+
+        `;
+
+
+        button.addEventListener(
+            "click",
+            () => openAccessDaySelector(accessInfo)
+        );
+
+
+        accessClassList.appendChild(button);
+
+    });
+
+}
+
+
+/* =========================================================
+   ACCESS DAY SELECTOR
+   ========================================================= */
+
+function openAccessDaySelector(
+    accessInfo
+) {
+
+    selectedAccessEl.innerHTML = `
+
+        <strong>
+            ${accessInfo.teacher}
+        </strong>
+
+        <br>
+
+        Room ${accessInfo.room}
+
+        <div
+            style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:8px;
+                margin-top:12px;
+            "
+        >
+
+            <button
+                class="menu-stripe"
+                onclick="setAccessOverride(
+                    'wednesday',
+                    '${accessInfo.teacher}',
+                    '${accessInfo.room}'
+                )"
+            >
+                Wednesday
+            </button>
+
+            <button
+                class="menu-stripe"
+                onclick="setAccessOverride(
+                    'thursday',
+                    '${accessInfo.teacher}',
+                    '${accessInfo.room}'
+                )"
+            >
+                Thursday
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SET ACCESS OVERRIDE
+   ========================================================= */
+
+function setAccessOverride(
+    day,
+    teacher,
+    room
+) {
+
+    accessOverrides[day] = {
+        teacher,
+        room
+    };
+
+
+    selectedAccessEl.innerHTML = `
+
+        <strong>
+            ${day.toUpperCase()}:
+        </strong>
+
+        ${teacher}
+
+        <br>
+
+        Room ${room}
+
+    `;
+
+
+    renderStatus();
+    renderScheduleList();
+
+}
+
+
+/* =========================================================
+   SELECTED ACCESS DISPLAY
+   ========================================================= */
+
+function updateSelectedAccessDisplay() {
+
+    const wednesday =
+        accessOverrides.wednesday;
+
+    const thursday =
+        accessOverrides.thursday;
+
+
+    if (
+        !wednesday &&
+        !thursday
+    ) {
+
+        selectedAccessEl.innerHTML = `
+            No Access override selected.
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    if (wednesday) {
+
+        html += `
+
+            <strong>
+                WEDNESDAY:
+            </strong>
+
+            ${wednesday.teacher}
+
+            <br>
+
+            Room ${wednesday.room}
+
+        `;
+
+    }
+
+
+    if (thursday) {
+
+        if (wednesday) {
+
+            html += `
+                <hr
+                    style="
+                        border:0;
+                        border-top:1px solid var(--border);
+                        margin:12px 0;
+                    "
+                >
+            `;
+
+        }
+
+
+        html += `
+
+            <strong>
+                THURSDAY:
+            </strong>
+
+            ${thursday.teacher}
+
+            <br>
+
+            Room ${thursday.room}
+
+        `;
+
+    }
+
+
+    selectedAccessEl.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   MENU
+   ========================================================= */
+
+function openMenu() {
+
+    menuOverlay.classList.add(
+        "open"
+    );
+
+}
+
+
+function closeMenu() {
+
+    menuOverlay.classList.remove(
+        "open"
+    );
+
+}
+
+
+document
+    .getElementById("menuButton")
+    .addEventListener(
+        "click",
+        openMenu
+    );
+
+
+document
+    .getElementById("closeMenu")
+    .addEventListener(
+        "click",
+        closeMenu
+    );
+
+
+menuOverlay.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            menuOverlay
+        ) {
+
+            closeMenu();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   PAGE NAVIGATION
+   ========================================================= */
+
+document
+    .getElementById("goSchedule")
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById("schedulePage")
+                .classList.remove("hidden");
+
+            document
+                .getElementById("lunchPage")
+                .classList.add("hidden");
+
+            closeMenu();
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+    );
+
+
+document
+    .getElementById("goLunch")
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById("schedulePage")
+                .classList.add("hidden");
+
+            document
+                .getElementById("lunchPage")
+                .classList.remove("hidden");
+
+            renderLunchPage();
+
+            closeMenu();
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+    );
+
+
+/* =========================================================
+   MINIMUM DAY
+   ========================================================= */
+
+minimumToggle.addEventListener(
+    "change",
+    () => {
+
+        manualMinimumMode =
+            minimumToggle.checked;
+
+
+        modeTextEl.textContent =
+            manualMinimumMode
+                ? "Minimum Day"
+                : "Normal Schedule";
+
+
+        renderEverything();
+
+    }
+);
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+darkToggle.addEventListener(
+    "change",
+    () => {
+
+        document.body.classList.toggle(
+            "dark",
+            darkToggle.checked
+        );
+
+
+        localStorage.setItem(
+            "ehsDarkMode",
+            darkToggle.checked
+                ? "true"
+                : "false"
+        );
+
+    }
+);
+
+
+/* Load saved dark mode */
+
+if (
+    localStorage.getItem(
+        "ehsDarkMode"
+    ) === "true"
+) {
+
+    darkToggle.checked = true;
+
+    document.body.classList.add(
+        "dark"
+    );
+
+}
+
+
+/* =========================================================
+   ACCESS MODAL EVENTS
+   ========================================================= */
+
+document
+    .getElementById("accessButton")
+    .addEventListener(
+        "click",
+        () => {
+
+            renderAccessClasses();
+
+            accessModal.classList.add(
+                "open"
+            );
+
+            closeMenu();
+
+        }
+    );
+
+
+document
+    .getElementById("closeAccessModal")
+    .addEventListener(
+        "click",
+        () => {
+
+            accessModal.classList.remove(
+                "open"
+            );
+
+        }
+    );
+
+
+accessModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            accessModal
+        ) {
+
+            accessModal.classList.remove(
+                "open"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   PWA INSTALL
+   ========================================================= */
+
+window.addEventListener(
+    "beforeinstallprompt",
+    event => {
+
+        /*
+           Keep Chrome from immediately showing
+           its install prompt.
+        */
+
+        event.preventDefault();
+
+        deferredInstallPrompt = event;
+
+        installSection.hidden = false;
+
+    }
+);
+
+
+installButton.addEventListener(
+    "click",
+    async () => {
+
+        if (!deferredInstallPrompt) {
+            return;
+        }
+
+
+        deferredInstallPrompt.prompt();
+
+
+        const result =
+            await deferredInstallPrompt.userChoice;
+
+
+        console.log(
+            "PWA install result:",
+            result.outcome
+        );
+
+
+        deferredInstallPrompt = null;
+
+        installSection.hidden = true;
+
+        closeMenu();
+
+    }
+);
+
+
+window.addEventListener(
+    "appinstalled",
+    () => {
+
+        deferredInstallPrompt = null;
+
+        installSection.hidden = true;
+
+        console.log(
+            "EHS Bell Schedule installed."
+        );
+
+    }
+);
+
+
+/* =========================================================
+   MASTER RENDER
+   ========================================================= */
+
+function renderEverything() {
+
+    renderHeaderDate();
+
+    renderAnnouncement();
+
+    renderStatus();
+
+    renderScheduleList();
+
+    renderLunchPage();
+
+}
+
+
+/* =========================================================
+   LIVE CLOCK
+   ========================================================= */
+
+setInterval(
+    () => {
+
+        renderEverything();
+
+    },
+    1000
+);
+
+
+/* =========================================================
+   INITIAL RENDER
+   ========================================================= */
+
+renderEverything();
+
+
+/* =========================================================
+   SERVICE WORKER
+   ========================================================= */
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            navigator.serviceWorker
+                .register("./sw.js")
+                .then(registration => {
+
+                    console.log(
+                        "EHS PWA service worker registered:",
+                        registration.scope
+                    );
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        "EHS PWA service worker registration failed:",
+                        error
+                    );
+
+                });
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+</html>
