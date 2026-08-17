@@ -1433,37 +1433,37 @@ const SCHOOL_TIMEZONE =
 const classes = {
 
     1: {
-        subject: "Biology",
+        subject: "BIOLOGY",
         teacher: "Jimenez-Arroyo, Freddy",
         room: "F-304"
     },
 
     2: {
-        subject: "Spanish 2",
+        subject: "SPANISH 2",
         teacher: "Rodriguez, Rosa",
         room: "F-324"
     },
 
     3: {
-        subject: "English 1 Adv",
+        subject: "ENGLISH 1 ADV",
         teacher: "Karantzalis, Athena E.",
         room: "F-225"
     },
 
     4: {
-        subject: "Freshman P.E.",
+        subject: "FRESHMAN P.E.",
         teacher: "Mann, Michael",
         room: "Gym"
     },
 
     5: {
-        subject: "Orch 3 - Honors Chamber",
+        subject: "ORCH 3 - HONORS CHAMBER",
         teacher: "Tran, Jasper A.",
         room: "C-105"
     },
 
     6: {
-        subject: "Adv. Algebra II",
+        subject: "ADV ALGEBRA II",
         teacher: "Snedden, Donald R.",
         room: "F-337"
     }
@@ -2399,8 +2399,7 @@ function makeEntry(item, date) {
 
             displayName =
                 homeroom
-                    ? homeroom.subject
-                    : "Homeroom";
+                    : "HOMEROOM ACCESS";
 
 
             teacher =
@@ -2431,7 +2430,7 @@ function makeEntry(item, date) {
 
 
             displayName =
-                "Responsive Access";
+                "RESPONSIVE ACCESS";
 
             teacher =
                 accessInfo.teacher;
@@ -2915,11 +2914,20 @@ function renderBeforeSchoolState(
     statusTitleEl.textContent =
         "SCHOOL STARTS SOON";
 
-
-    if (next) {
-
-        statusNextEl.textContent =
-            `FIRST CLASS: ${next.displayName}`;
+     
+     if (next) {
+     
+         statusNextEl.innerHTML = `
+             <span class="first-class-label">
+                 FIRST CLASS
+             </span>
+     
+             <span class="first-class-name">
+                 ${next.displayName}
+             </span>
+         `;
+     
+     }
 
 
         const remaining =
@@ -2939,24 +2947,12 @@ function renderBeforeSchoolState(
             <div class="detail">
 
                 <div class="detail-label">
-                    Starts
+                    Time
                 </div>
 
                 <div class="detail-value">
                     ${formatTime(next.startDate)}
-                </div>
-
-            </div>
-
-
-            <div class="detail">
-
-                <div class="detail-label">
-                    Teacher
-                </div>
-
-                <div class="detail-value">
-                    ${next.teacher || "—"}
+                    ${formatTime(next.endDate)}
                 </div>
 
             </div>
@@ -2970,6 +2966,19 @@ function renderBeforeSchoolState(
 
                 <div class="detail-value">
                     ${next.room || "—"}
+                </div>
+
+            </div>
+
+
+            <div class="detail">
+
+                <div class="detail-label">
+                    Teacher
+                </div>
+
+                <div class="detail-value">
+                    ${next.teacher || "—"}
                 </div>
 
             </div>
