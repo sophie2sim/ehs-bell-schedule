@@ -48,7 +48,8 @@ self.addEventListener("install", event => {
 
                 /*
                    Activate the new service worker
-                   as soon as installation finishes.
+                   immediately instead of waiting for
+                   all old app tabs to close.
                 */
 
                 return self.skipWaiting();
@@ -58,32 +59,6 @@ self.addEventListener("install", event => {
     );
 
 });
-
-
-/* =========================
-   MESSAGE
-   ========================= */
-
-self.addEventListener(
-    "message",
-    event => {
-
-        /*
-           Allows the page to tell a newly installed
-           service worker to activate immediately.
-        */
-
-        if (
-            event.data &&
-            event.data.type === "SKIP_WAITING"
-        ) {
-
-            self.skipWaiting();
-
-        }
-
-    }
-);
 
 
 /* =========================
@@ -124,8 +99,7 @@ self.addEventListener("activate", event => {
             .then(() => {
 
                 /*
-                   Take control of all currently
-                   open pages immediately.
+                   Take control of the app immediately.
                 */
 
                 return self.clients.claim();
@@ -155,133 +129,90 @@ self.addEventListener("fetch", event => {
 
 
     /*
-       For navigations (opening/reloading the app),
-       try the network FIRST.
+       Only handle requests belonging
+       to this website/app.
 
-       This is important because your app lives
-       on GitHub Pages and you want new versions
-       to be detected without reinstalling.
+       External requests are left alone.
     */
 
+    const requestURL =
+        new URL(event.request.url);
+
     if (
-        event.request.mode ===
-        "navigate"
+        requestURL.origin !== self.location.origin
     ) {
-
-        event.respondWith(
-
-            fetch(event.request)
-
-                .then(response => {
-
-                    /*
-                       Save the newest index.html
-                       in the cache.
-                    */
-
-                    if (
-                        response &&
-                        response.status === 200
-                    ) {
-
-                        const responseClone =
-                            response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(cache => {
-
-                                cache.put(
-                                    "./index.html",
-                                    responseClone
-                                );
-
-                            });
-
-                    }
-
-                    return response;
-
-                })
-
-                .catch(() => {
-
-                    /*
-                       If there is no internet,
-                       use the cached application.
-                    */
-
-                    return caches.match(
-                        "./index.html"
-                    );
-
-                })
-
-        );
 
         return;
 
     }
 
 
-    /*
-       For other files, use cache first.
-
-       If the file isn't cached yet, fetch it
-       from GitHub Pages and cache it.
-    */
-
     event.respondWith(
 
-        caches.match(event.request)
+        /*
+           IMPORTANT:
 
-            .then(cachedResponse => {
+           NETWORK FIRST.
 
-                if (cachedResponse) {
+           Every time the app requests a file,
+           we try GitHub/your hosted website FIRST.
 
-                    return cachedResponse;
+           This means when you update index.html
+           on GitHub, the phone can receive the
+           updated version without reinstalling.
+        */
+
+        fetch(event.request)
+
+            .then(response => {
+
+                /*
+                   Only cache successful responses.
+                */
+
+                if (
+                    response &&
+                    response.status === 200
+                ) {
+
+                    const responseClone =
+                        response.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+
+                            cache.put(
+                                event.request,
+                                responseClone
+                            );
+
+                        });
 
                 }
 
+                /*
+                   Give the freshly downloaded
+                   version to the app immediately.
+                */
 
-                return fetch(event.request)
+                return response;
 
-                    .then(response => {
+            })
 
-                        if (
-                            response &&
-                            response.status === 200 &&
-                            response.type === "basic"
-                        ) {
+            .catch(() => {
 
-                            const responseClone =
-                                response.clone();
+                /*
+                   No internet?
 
-                            caches.open(CACHE_NAME)
-                                .then(cache => {
+                   Use the cached version instead.
 
-                                    cache.put(
-                                        event.request,
-                                        responseClone
-                                    );
+                   This is what keeps the PWA
+                   working offline.
+                */
 
-                                });
-
-                        }
-
-                        return response;
-
-                    })
-
-                    .catch(() => {
-
-                        /*
-                           Nothing was cached and the
-                           network is unavailable.
-                        */
-
-                        return undefined;
-
-                    });
+                return caches.match(
+                    event.request
+                );
 
             })
 
