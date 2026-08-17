@@ -1884,6 +1884,121 @@ let accessOverrides = {
 
 
 /* =========================================================
+   ACCESS WEEK STORAGE
+   ========================================================= */
+
+/*
+   Access selections are saved for the current school week.
+
+   This means:
+   - Wednesday's selection applies to that Wednesday
+   - Thursday's selection applies to that Thursday
+   - Next week starts fresh
+   - You do NOT have to manually clear old selections
+*/
+
+function getWeekKey(date = now()) {
+
+    const d = new Date(date);
+
+    /*
+       Monday is the first day of the school week.
+    */
+
+    const day =
+        d.getDay();
+
+    const daysSinceMonday =
+        day === 0
+            ? 6
+            : day - 1;
+
+    d.setDate(
+        d.getDate() - daysSinceMonday
+    );
+
+    return getDateKey(d);
+
+}
+
+
+function getAccessStorageKey() {
+
+    return `ehsAccess_${getWeekKey()}`;
+
+}
+
+
+function loadAccessOverrides() {
+
+    const saved =
+        localStorage.getItem(
+            getAccessStorageKey()
+        );
+
+
+    if (!saved) {
+
+        accessOverrides = {
+            wednesday: null,
+            thursday: null
+        };
+
+        return;
+
+    }
+
+
+    try {
+
+        const parsed =
+            JSON.parse(saved);
+
+
+        accessOverrides = {
+
+            wednesday:
+                parsed.wednesday || null,
+
+            thursday:
+                parsed.thursday || null
+
+        };
+
+    } catch (error) {
+
+        console.error(
+            "Could not load Access selections:",
+            error
+        );
+
+        accessOverrides = {
+            wednesday: null,
+            thursday: null
+        };
+
+    }
+
+}
+
+
+function saveAccessOverrides() {
+
+    localStorage.setItem(
+        getAccessStorageKey(),
+        JSON.stringify(accessOverrides)
+    );
+
+}
+
+
+/*
+   Load the Access choices when the app starts.
+*/
+
+loadAccessOverrides();
+
+/* =========================================================
    DOM
    ========================================================= */
 
@@ -2180,6 +2295,7 @@ function getAccessInfo(dayName) {
     const override =
         accessOverrides[dayName];
 
+
     if (!override) {
 
         return {
@@ -2188,6 +2304,7 @@ function getAccessInfo(dayName) {
         };
 
     }
+
 
     return override;
 
@@ -2219,6 +2336,13 @@ function makeEntry(item, date) {
     let room = "";
 
 
+    /*
+       Normal class periods.
+
+       Period 1 = Homeroom, so Monday Access
+       will use the Period 1 information.
+    */
+
     if (item.period !== undefined) {
 
         const classInfo =
@@ -2242,22 +2366,80 @@ function makeEntry(item, date) {
     }
 
 
+    /*
+       ACCESS LOGIC
+       -----------------------------------------------------
+
+       Monday:
+       Always use Period 1 / Homeroom information.
+
+       Wednesday + Thursday:
+       Use the Access selection chosen for
+       the current school week.
+    */
+
     if (item.type === "access") {
 
         const day =
             getDayName(date);
 
-        const accessInfo =
-            getAccessInfo(day);
 
-        displayName =
-            "Responsive Access";
+        /*
+           MONDAY HOMEROOM
 
-        teacher =
-            accessInfo.teacher;
+           Homeroom is always the information
+           from first period.
+        */
 
-        room =
-            accessInfo.room;
+        if (day === "monday") {
+
+            const homeroom =
+                getClassForPeriod(1);
+
+
+            displayName =
+                homeroom
+                    ? homeroom.subject
+                    : "Homeroom";
+
+
+            teacher =
+                homeroom
+                    ? homeroom.teacher
+                    : "";
+
+
+            room =
+                homeroom
+                    ? homeroom.room
+                    : "";
+
+        }
+
+
+        /*
+           WEDNESDAY / THURSDAY ACCESS
+        */
+
+        else if (
+            day === "wednesday" ||
+            day === "thursday"
+        ) {
+
+            const accessInfo =
+                getAccessInfo(day);
+
+
+            displayName =
+                "Responsive Access";
+
+            teacher =
+                accessInfo.teacher;
+
+            room =
+                accessInfo.room;
+
+        }
 
     }
 
@@ -2309,6 +2491,7 @@ function getDayState(date = now()) {
     const entries =
         getEntries(date);
 
+
     if (!entries.length) {
 
         return {
@@ -2340,25 +2523,76 @@ function getDayState(date = now()) {
         });
 
 
-    if (!current && next) {
+    /*
+       BEFORE SCHOOL
+
+       If the current time is before the
+       very first scheduled block, this is
+       NOT a passing period.
+
+       It is simply before school.
+    */
+
+    if (
+        !current &&
+        entries.length &&
+        date < entries[0].startDate
+    ) {
 
         return {
-            status: "passing",
+
+            status: "before-school",
+
             current: null,
-            next,
+
+            next: entries[0],
+
             entries
+
         };
 
     }
 
 
+    /*
+       PASSING PERIOD
+
+       We're between two scheduled blocks.
+    */
+
+    if (!current && next) {
+
+        return {
+
+            status: "passing",
+
+            current: null,
+
+            next,
+
+            entries
+
+        };
+
+    }
+
+
+    /*
+       SCHOOL DAY IS FINISHED
+    */
+
     if (!current && !next) {
 
         return {
+
             status: "school-over",
+
             current: null,
+
             next: null,
+
             entries
+
         };
 
     }
@@ -2518,34 +2752,46 @@ function renderStatus() {
     }
 
 
-    if (state.status === "class") {
+    if (state.status === "before-school") {
 
-        renderClassState(
-            state.current,
-            state.next,
-            currentTime
-        );
+    renderBeforeSchoolState(
+        state.next,
+        currentTime
+    );
 
-        return;
+    return;
 
-    }
-
-
-    if (state.status === "passing") {
-
-        renderPassingState(
-            state.next,
-            currentTime
-        );
-
-        return;
-
-    }
-
-
-    renderSchoolOver();
-
-}
+     }
+     
+     
+     if (state.status === "class") {
+     
+         renderClassState(
+             state.current,
+             state.next,
+             currentTime
+         );
+     
+         return;
+     
+     }
+     
+     
+     if (state.status === "passing") {
+     
+         renderPassingState(
+             state.next,
+             currentTime
+         );
+     
+         return;
+     
+     }
+     
+     
+         renderSchoolOver();
+     
+     }
 
 
 /* =========================================================
@@ -2653,6 +2899,114 @@ function renderClassState(
 
 }
 
+
+/* =========================================================
+   BEFORE SCHOOL STATE
+   ========================================================= */
+
+function renderBeforeSchoolState(
+    next,
+    currentTime
+) {
+
+    statusLabelEl.textContent =
+        "School Starts In";
+
+    statusTitleEl.textContent =
+        "SCHOOL STARTS SOON";
+
+
+    if (next) {
+
+        statusNextEl.textContent =
+            `FIRST CLASS: ${next.displayName}`;
+
+
+        const remaining =
+            next.startDate -
+            currentTime;
+
+
+        countdownEl.textContent =
+            formatDuration(remaining);
+
+        countdownCaptionEl.textContent =
+            "UNTIL SCHOOL STARTS";
+
+
+        classDetailsEl.innerHTML = `
+
+            <div class="detail">
+
+                <div class="detail-label">
+                    Starts
+                </div>
+
+                <div class="detail-value">
+                    ${formatTime(next.startDate)}
+                </div>
+
+            </div>
+
+
+            <div class="detail">
+
+                <div class="detail-label">
+                    Teacher
+                </div>
+
+                <div class="detail-value">
+                    ${next.teacher || "—"}
+                </div>
+
+            </div>
+
+
+            <div class="detail">
+
+                <div class="detail-label">
+                    Room
+                </div>
+
+                <div class="detail-value">
+                    ${next.room || "—"}
+                </div>
+
+            </div>
+
+
+            <div class="detail">
+
+                <div class="detail-label">
+                    Period
+                </div>
+
+                <div class="detail-value">
+                    ${next.name}
+                </div>
+
+            </div>
+
+        `;
+
+
+        renderNextClass(next);
+
+        return;
+
+    }
+
+
+    countdownEl.textContent =
+        "00:00:00";
+
+    countdownCaptionEl.textContent =
+        "UNTIL SCHOOL STARTS";
+
+
+    classDetailsEl.innerHTML = "";
+
+}
 
 /* =========================================================
    PASSING STATE
@@ -3434,6 +3788,14 @@ function setAccessOverride(
     };
 
 
+    /*
+       Save the selection specifically
+       for the current school week.
+    */
+
+    saveAccessOverrides();
+
+
     selectedAccessEl.innerHTML = `
 
         <strong>
@@ -3446,6 +3808,16 @@ function setAccessOverride(
 
         Room ${room}
 
+        <div
+            style="
+                margin-top:8px;
+                font-size:0.85rem;
+                opacity:0.7;
+            "
+        >
+            Saved for this school week.
+        </div>
+
     `;
 
 
@@ -3453,7 +3825,6 @@ function setAccessOverride(
     renderScheduleList();
 
 }
-
 
 /* =========================================================
    SELECTED ACCESS DISPLAY
