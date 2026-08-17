@@ -1,4 +1,4 @@
-const CACHE_NAME = "ehs-bell-schedule-v1";
+const CACHE_NAME = "ehs-bell-schedule-v2";
 
 const APP_FILES = [
     "./",
