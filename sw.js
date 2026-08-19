@@ -1,10 +1,11 @@
-const CACHE_NAME = "ehs-bell-schedule-v3";
+const CACHE_NAME = "ehs-bell-schedule-v1";
 
 const APP_FILES = [
     "./",
     "./index.html",
     "./manifest.webmanifest",
-    "./icons/icon-192-2.png"
+    "./icons/icon-192.png"
+    // "./icons/icon-512.png"
 ];
 
 
@@ -45,11 +46,6 @@ self.addEventListener("install", event => {
             })
             .then(() => {
 
-                /*
-                   Activate the new service worker
-                   as soon as installation finishes.
-                */
-
                 return self.skipWaiting();
 
             })
@@ -57,32 +53,6 @@ self.addEventListener("install", event => {
     );
 
 });
-
-
-/* =========================
-   MESSAGE
-   ========================= */
-
-self.addEventListener(
-    "message",
-    event => {
-
-        /*
-           Allows the page to tell a newly installed
-           service worker to activate immediately.
-        */
-
-        if (
-            event.data &&
-            event.data.type === "SKIP_WAITING"
-        ) {
-
-            self.skipWaiting();
-
-        }
-
-    }
-);
 
 
 /* =========================
@@ -100,32 +70,18 @@ self.addEventListener("activate", event => {
 
                     cacheNames
                         .filter(name => {
-
                             return (
                                 name !== CACHE_NAME
                             );
-
                         })
                         .map(name => {
-
-                            console.log(
-                                "Deleting old cache:",
-                                name
-                            );
-
                             return caches.delete(name);
-
                         })
 
                 );
 
             })
             .then(() => {
-
-                /*
-                   Take control of all currently
-                   open pages immediately.
-                */
 
                 return self.clients.claim();
 
@@ -143,108 +99,31 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
 
     /*
-       Only handle GET requests.
+       The bell schedule is completely
+       client-side, so cached files can
+       be served without internet.
     */
 
     if (event.request.method !== "GET") {
-
         return;
-
     }
-
-
-    /*
-       For navigations (opening/reloading the app),
-       try the network FIRST.
-
-       If GitHub is available, the newest version
-       will be loaded and cached.
-
-       If GitHub is unavailable, the previously
-       cached version will be used.
-    */
-
-    if (
-        event.request.mode ===
-        "navigate"
-    ) {
-
-        event.respondWith(
-
-            fetch(event.request)
-
-                .then(response => {
-
-                    if (
-                        response &&
-                        response.status === 200
-                    ) {
-
-                        const responseClone =
-                            response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(cache => {
-
-                                cache.put(
-                                    "./index.html",
-                                    responseClone
-                                );
-
-                            });
-
-                    }
-
-                    return response;
-
-                })
-
-                .catch(() => {
-
-                    /*
-                       No internet.
-
-                       Use the last successfully
-                       cached version.
-                    */
-
-                    return caches.match(
-                        "./index.html"
-                    );
-
-                })
-
-        );
-
-        return;
-
-    }
-
-
-    /*
-       For other files:
-
-       1. Use the cached version if available.
-       2. Otherwise fetch from GitHub Pages.
-       3. Cache the successful response.
-    */
 
     event.respondWith(
 
         caches.match(event.request)
-
             .then(cachedResponse => {
 
                 if (cachedResponse) {
-
                     return cachedResponse;
-
                 }
 
-
                 return fetch(event.request)
-
                     .then(response => {
+
+                        /*
+                           Cache successful same-origin
+                           responses for future offline use.
+                        */
 
                         if (
                             response &&
@@ -270,15 +149,23 @@ self.addEventListener("fetch", event => {
                         return response;
 
                     })
-
                     .catch(() => {
 
                         /*
-                           Nothing was cached and
-                           the network is unavailable.
+                           If navigation fails while offline,
+                           return the cached application.
                         */
 
-                        return undefined;
+                        if (
+                            event.request.mode ===
+                            "navigate"
+                        ) {
+
+                            return caches.match(
+                                "./index.html"
+                            );
+
+                        }
 
                     });
 
